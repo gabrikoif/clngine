@@ -1,17 +1,9 @@
 #pragma once
 
 #include <vector>
-#include <glm/glm.hpp>
+#include "graphics.h"
 
 namespace MeshUtils {
-
-    // Clean vertex layout using GLM types
-    struct Vertex {
-        glm::vec3 position;
-        glm::vec3 normal;
-        glm::vec2 texCoords;
-    };
-
     // A container to hold our OpenGL buffer IDs and draw count
     struct GLMesh {
         unsigned int VAO = 0;
