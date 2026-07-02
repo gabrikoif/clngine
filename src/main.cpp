@@ -9,6 +9,7 @@
 #include "input.h"
 #include "shader.h"
 #include "meshutils.h"
+#include "meshgeometry.h"
 
 int main()
 {
@@ -51,13 +52,16 @@ int main()
     // glViewport(width, height);
 
     // vertices
+    Mesh sphere = MeshGen::CreateSphere(0.5f);
 
     // clang-format off
     // clang-format on
 
 
+    MeshUtils::GLMesh readymesh = MeshUtils::uploadToGPU(sphere.vertices, sphere.indices);
 
     Shader shader("./shader/vertex.glsl", "./shader/fragment.glsl");
+    GLint colorLoc = shader.getLocation("uColor");
     shader.use();
 
     while (!glfwWindowShouldClose(window))
@@ -70,6 +74,9 @@ int main()
         }
 
         shader.use();
+        shader.setVec3("uColor", glm::vec3(1.0f, 0.0f, 0.0f), colorLoc);
+        glBindVertexArray(readymesh.VAO);
+        glDrawElements(GL_TRIANGLE_FAN, readymesh.indexCount, GL_UNSIGNED_INT, (void*)0);
 
         glfwSwapBuffers(window);
         glfwPollEvents();

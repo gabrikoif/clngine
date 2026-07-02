@@ -11,6 +11,7 @@ set(PROJECT_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/src/input.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/shader.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/gpumesh.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/meshgeometry.cpp
 )
 
 # 2. Add header search paths (your code directory + GLAD headers)
