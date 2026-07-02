@@ -78,9 +78,9 @@ void Shader::use() const
 
 // ---- Uniform Setters ----
 
-void Shader::getLocation(const std::string &name) const
+GLint Shader::getLocation(const std::string &name) const
 {
-    glGetUniformLocation(ID, name.c_str());
+    return glGetUniformLocation(ID, name.c_str());
 }
 
 

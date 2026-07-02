@@ -21,7 +21,7 @@ public:
     void use() const;
 
     // Uniform location
-    void getLocation(const std::string &name) const;
+    GLint getLocation(const std::string &name) const;
 
     // Utility uniform setter functions
     void setVec3(const std::string& name, const glm::vec3& vec, const unsigned int location = 0) const;
