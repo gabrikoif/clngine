@@ -5,7 +5,7 @@ float lastX = 400.0f;
 float lastY = 300.0f;
 bool firstMouse = true;
 
-float walkSens = 0.01f;
+float walkSens = 5.0f;
 
 void mouse_callback(GLFWwindow *window, double xpos, double ypos)
 {
