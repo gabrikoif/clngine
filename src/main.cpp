@@ -55,19 +55,20 @@ int main()
     glfwGetFramebufferSize(window, &width, &height);
 
     // vertices
-    Mesh sphere = MeshGen::CreateSphere(2.0f);
+    Mesh sphere = MeshGen::CreateSphere(10.0f);
 
     MeshUtils::GLMesh readymesh = MeshUtils::uploadToGPU(sphere.vertices, sphere.indices);
 
     // ==========================================
     // INSTANCING SETUP START
     // ==========================================
-    const int NUM_SPHERES = 10000;
+    const int NUM_SPHERES = 100;
     const float BOUNDS = 500.0f; // Range from -25 to +25
 
     std::random_device rd;
     std::mt19937 gen(rd());
     std::uniform_real_distribution<float> dis(-BOUNDS, BOUNDS);
+    std::uniform_real_distribution<float> zero_to_one(0.0f, 1.0f);
 
     // 1. Generate initial random positions / matrices on CPU
     std::vector<glm::mat4> sphereMatrices;
@@ -76,15 +77,16 @@ int main()
     {
         glm::mat4 model = glm::mat4(1.0f);
         model = glm::translate(model, glm::vec3(dis(gen), dis(gen), dis(gen)));
+        // model = glm::rotate(model, 45.0f, glm::vec3(zero_to_one(gen), zero_to_one(gen), zero_to_one(gen)));
+        // When time comes and I have texcoords
         sphereMatrices.push_back(model);
     }
 
-    std::uniform_real_distribution<float> dih(0.0f, 1.0f);
     std::vector<glm::vec3> sphereColors;
     sphereColors.reserve(NUM_SPHERES);
     for (int i = 0; i < NUM_SPHERES; ++i)
     {
-        glm::vec3 color = glm::vec3(dih(gen), dih(gen), dih(gen));
+        glm::vec3 color = glm::vec3(zero_to_one(gen), zero_to_one(gen), zero_to_one(gen));
         sphereColors.push_back(color);
     }
 
@@ -112,11 +114,12 @@ int main()
     Shader shader("./shader/vertex.glsl", "./shader/fragment.glsl");
 
     Camera camera;
-    camera.fov = 90.0f;
+    camera.fov = 103.0f;
     camera.farPlane = 1500.0f;
     camera.nearPlane = 1.0f;
     globalCamPointer = &camera;
 
+    bool needsGPUUpdate = true;
     while (!glfwWindowShouldClose(window))
     {
         // Fetch fresh dimensions in case of resizing
@@ -138,9 +141,10 @@ int main()
             sphereColors.reserve(NUM_SPHERES);
             for (int i = 0; i < NUM_SPHERES; ++i)
             {
-                glm::vec3 color = glm::vec3(dih(gen), dih(gen), dih(gen));
+                glm::vec3 color = glm::vec3(zero_to_one(gen), zero_to_one(gen), zero_to_one(gen));
                 sphereColors.push_back(color);
             }
+            needsGPUUpdate = true;
         }
 
         float aspectRatio = (float)width / (float)height;
@@ -155,13 +159,18 @@ int main()
         // world.update();
 
         // 2. UPLOAD PHASE (CPU -> GPU)
-        glBindBuffer(GL_ARRAY_BUFFER, modelBuffer.getId());
-        glBufferSubData(GL_ARRAY_BUFFER, 0, sphereMatrices.size() * sizeof(glm::mat4), sphereMatrices.data());
-        glBindBuffer(GL_ARRAY_BUFFER, 0);
+        if (needsGPUUpdate)
+        {
+            glBindBuffer(GL_ARRAY_BUFFER, modelBuffer.getId());
+            glBufferSubData(GL_ARRAY_BUFFER, 0, sphereMatrices.size() * sizeof(glm::mat4), sphereMatrices.data());
+            glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-        glBindBuffer(GL_ARRAY_BUFFER, colorBuffer.getId());
-        glBufferSubData(GL_ARRAY_BUFFER, 0, NUM_SPHERES * sizeof(glm::vec3), sphereColors.data());
-        glBindBuffer(GL_ARRAY_BUFFER, 0);
+            glBindBuffer(GL_ARRAY_BUFFER, colorBuffer.getId());
+            glBufferSubData(GL_ARRAY_BUFFER, 0, NUM_SPHERES * sizeof(glm::vec3), sphereColors.data());
+            glBindBuffer(GL_ARRAY_BUFFER, 0);
+            
+            needsGPUUpdate = false;
+        }
 
         // 3. RENDER PHASE (GPU)
         shader.use();
