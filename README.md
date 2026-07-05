@@ -46,7 +46,24 @@ To build and run the system locally, ensure your environment meets the following
 * **Compiler:** `GCC` / `G++ 9+` or any modern C++ compiler supporting standard `C++17` primitives
 * **Graphics Driver:** An environment with hardware support for **OpenGL 3.3+ Core Profile**
 
----
+## Test it yourself
+
+To get the project up and running locally, follow these simple steps:
+
+1. **Clone the repository:**
+```bash
+git clone https://github.com/gabrikoif/clngine.git
+
+```
+
+
+2. **Open in your IDE:**
+Open the cloned folder in any IDE that supports **CMake**.
+* *Recommendation:* I highly recommend you use **Visual Studio Code (VS Code)** with the *CMake Tools* extension for the smoothest setup.
+
+
+3. **Run the project:**
+Once your IDE finishes configuring the CMake project, simply build and run it directly through your environment.
 
 ---
 `C++17` `OpenGL 3.3+` `GLFW` `GLM`
