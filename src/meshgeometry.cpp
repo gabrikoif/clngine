@@ -1,5 +1,5 @@
 #define _USE_MATH_DEFINES
-#include "meshgeometry.h"
+#include "meshgeometry.hpp"
 #include <cmath>
 
 namespace MeshGen {

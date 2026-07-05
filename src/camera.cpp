@@ -1,4 +1,4 @@
-#include "camera.h"
+#include "camera.hpp"
 
 // Constructor: Uses initializer list to set up default values
 Camera::Camera(glm::vec3 startPos)

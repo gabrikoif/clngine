@@ -1,6 +1,6 @@
 #include <glad/glad.h>
 // Header with the structs.
-#include "meshutils.h"
+#include "meshutils.hpp"
 
 namespace MeshUtils
 {
