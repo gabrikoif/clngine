@@ -8,10 +8,11 @@
 #include <random> // Added for generating random positions
 
 #include "input.h"
-#include "shader.h"
-#include "meshutils.h"
-#include "meshgeometry.h"
-#include "camera.h"
+#include "shader.hpp"
+#include "meshutils.hpp"
+#include "meshgeometry.hpp"
+#include "camera.hpp"
+#include "databuffer.hpp"
 
 int main()
 {
@@ -27,7 +28,7 @@ int main()
 
     GLFWmonitor *monitor = glfwGetPrimaryMonitor();
     const GLFWvidmode *mode = glfwGetVideoMode(monitor);
-    GLFWwindow *window = glfwCreateWindow(mode->width, mode->height, "Collisiongine", monitor, nullptr);
+    GLFWwindow *window = glfwCreateWindow(mode->width, mode->height, "Collisiongine", nullptr, nullptr);
     if (window == nullptr)
     {
         std::cout << "GLFW Window initialization error." << std::endl;
@@ -61,7 +62,7 @@ int main()
     // ==========================================
     // INSTANCING SETUP START
     // ==========================================
-    const int NUM_SPHERES = 1000;
+    const int NUM_SPHERES = 10000;
     const float BOUNDS = 500.0f; // Range from -25 to +25
 
     std::random_device rd;
@@ -78,46 +79,31 @@ int main()
         sphereMatrices.push_back(model);
     }
 
+    std::uniform_real_distribution<float> dih(0.0f, 1.0f);
     std::vector<glm::vec3> sphereColors;
     sphereColors.reserve(NUM_SPHERES);
     for (int i = 0; i < NUM_SPHERES; ++i)
     {
-        glm::vec3 color = glm::vec3(dis(gen), dis(gen), dis(gen));
+        glm::vec3 color = glm::vec3(dih(gen), dih(gen), dih(gen));
         sphereColors.push_back(color);
     }
 
     // 2. Create the VBO to hold instance data on GPU
-    GLuint instanceVBO;
-    glGenBuffers(1, &instanceVBO);
-    glBindBuffer(GL_ARRAY_BUFFER, instanceVBO);
-    glBufferData(GL_ARRAY_BUFFER, NUM_SPHERES * sizeof(glm::mat4), nullptr, GL_DYNAMIC_DRAW);
+    AttribConfig modelConfig;
+    modelConfig.slot = 3;
+    modelConfig.count = 16;
+    modelConfig.divisor = 1;
+    modelConfig.type = GL_FLOAT;
 
-    // 3. Link the matrix properties to the sphere's VAO
-    glBindVertexArray(readymesh.VAO);
-    std::size_t vec4Size = sizeof(glm::vec4);
-    for (unsigned int i = 0; i < 4; i++)
-    {
-        glEnableVertexAttribArray(3 + i); // Slots 3, 4, 5, 6
-        glVertexAttribPointer(3 + i, 4, GL_FLOAT, GL_FALSE, sizeof(glm::mat4), (void *)(i * vec4Size));
-        glVertexAttribDivisor(3 + i, 1); // Progresses 1 step per instance, not per vertex
-    }
-    glBindVertexArray(0);
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    DataBuffer modelBuffer(readymesh.VAO, sphereMatrices, modelConfig, 1);
 
-    GLuint colorsVBO;
-    glGenBuffers(1, &colorsVBO);
-    glBindBuffer(GL_ARRAY_BUFFER, colorsVBO);
-    glBufferData(GL_ARRAY_BUFFER, NUM_SPHERES * sizeof(glm::vec3), nullptr, GL_DYNAMIC_DRAW);
+    AttribConfig colorConfig;
+    colorConfig.slot = 7;
+    colorConfig.count = 3;
+    colorConfig.divisor = 1;
+    colorConfig.type = GL_FLOAT;
 
-    glBindVertexArray(readymesh.VAO);
-
-    glEnableVertexAttribArray(7);
-    glVertexAttribPointer(7, 3, GL_FLOAT, GL_FALSE, sizeof(glm::vec3), (void *)0);
-    glVertexAttribDivisor(7, 1);
-
-    glBindVertexArray(0);
-
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    DataBuffer colorBuffer(readymesh.VAO, sphereColors, colorConfig, 1);
 
     // ==========================================
     // INSTANCING SETUP END
@@ -152,7 +138,7 @@ int main()
             sphereColors.reserve(NUM_SPHERES);
             for (int i = 0; i < NUM_SPHERES; ++i)
             {
-                glm::vec3 color = glm::vec3(dis(gen), dis(gen), dis(gen));
+                glm::vec3 color = glm::vec3(dih(gen), dih(gen), dih(gen));
                 sphereColors.push_back(color);
             }
         }
@@ -169,11 +155,11 @@ int main()
         // world.update();
 
         // 2. UPLOAD PHASE (CPU -> GPU)
-        glBindBuffer(GL_ARRAY_BUFFER, instanceVBO);
+        glBindBuffer(GL_ARRAY_BUFFER, modelBuffer.getId());
         glBufferSubData(GL_ARRAY_BUFFER, 0, sphereMatrices.size() * sizeof(glm::mat4), sphereMatrices.data());
         glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-        glBindBuffer(GL_ARRAY_BUFFER, colorsVBO);
+        glBindBuffer(GL_ARRAY_BUFFER, colorBuffer.getId());
         glBufferSubData(GL_ARRAY_BUFFER, 0, NUM_SPHERES * sizeof(glm::vec3), sphereColors.data());
         glBindBuffer(GL_ARRAY_BUFFER, 0);
 
@@ -196,8 +182,6 @@ int main()
     }
 
     // Clean up our allocated buffer before closing down
-    glDeleteBuffers(1, &instanceVBO);
-    glDeleteBuffers(1, &colorsVBO);
     MeshUtils::deleteFromGPU(readymesh);
 
     glfwTerminate();
