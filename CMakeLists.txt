@@ -1,6 +1,8 @@
 ﻿cmake_minimum_required(VERSION 3.15)
 project(clngine C CXX)
 
+
+
 # Require C++17 for modern language features
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -14,6 +16,7 @@ set(PROJECT_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/src/meshgeometry.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/camera.cpp
 )
+
 
 # 2. Add header search paths (your code directory + GLAD headers)
 include_directories(
@@ -58,11 +61,23 @@ else()
     find_package(glm CONFIG REQUIRED)
 endif()
 
+# Force the executable to be placed directly in the top-level build directory
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
+
+# Do the same for specific build configurations (Debug, Release, etc.)
+foreach(OUTPUTCONFIG ${CMAKE_CONFIGURATION_TYPES})
+    string(TOUPPER ${OUTPUTCONFIG} CONFIG)
+    set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_${CONFIG} ${CMAKE_BINARY_DIR})
+endforeach()
+
 # 6. Define the final application executable target
 add_executable(${PROJECT_NAME} 
     ${PROJECT_SOURCES} 
     ${CMAKE_CURRENT_SOURCE_DIR}/dependencies/glad/glad.c
- )
+)
+
+file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/shader 
+     DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 
 # 7. Link third-party libraries and drivers to your application
 target_link_libraries(${PROJECT_NAME} 
