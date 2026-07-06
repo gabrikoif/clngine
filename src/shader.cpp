@@ -5,7 +5,9 @@
 #include <sstream>
 #include <iostream>
 
-Shader::Shader(const std::string &vertexPath, const std::string &fragmentPath)
+Shader::Shader() : ID() {};
+
+void Shader::load(const std::string &vertexPath, const std::string &fragmentPath)
 {
     // 1. Retrieve the vertex/fragment source code from file paths
     std::string vertexCode;
