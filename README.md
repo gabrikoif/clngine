@@ -1,6 +1,6 @@
 # CLngine
 
-> **Status: Active Development**
+> **Status: Active Development**  
 > *CLngine* is short for **Collision Engine**, a high-performance framework designed to handle real-time physical environments with thousands of interacting objects.
 
 ---
