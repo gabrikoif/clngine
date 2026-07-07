@@ -10,6 +10,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(PROJECT_SOURCES
     #${CMAKE_CURRENT_SOURCE_DIR}/src/
     ${CMAKE_CURRENT_SOURCE_DIR}/src/main.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/engine.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/input.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/shader.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/gpumesh.cpp
@@ -63,6 +64,12 @@ endif()
 
 # Force the executable to be placed directly in the top-level build directory
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
+# Override the multi-config subfolders for every standard build type
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_DEBUG   ${CMAKE_BINARY_DIR})
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELEASE ${CMAKE_BINARY_DIR})
+# Optional: handle less common configurations just in case
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELWITHDEBINFO ${CMAKE_BINARY_DIR})
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_MINSIZEREL     ${CMAKE_BINARY_DIR})
 
 # Do the same for specific build configurations (Debug, Release, etc.)
 foreach(OUTPUTCONFIG ${CMAKE_CONFIGURATION_TYPES})
