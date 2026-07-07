@@ -6,6 +6,7 @@
 #include <vector>
 #include <iostream>
 #include <random>
+#include <memory>
 
 #include "input.h"
 #include "camera.hpp"
