@@ -138,11 +138,9 @@ void Engine::run()
 {
     while (!glfwWindowShouldClose(m_window))
     {
-        Engine::processInput();
-
-        Engine::update();
-
-        Engine::render();
+        processInput();
+        update();
+        render();
     }
 }
 
