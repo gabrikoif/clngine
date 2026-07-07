@@ -3,20 +3,6 @@
 Engine::Engine() : m_isRunning(false) {};
 Engine::~Engine() {};
 
-#include <glad/glad.h>
-#include <GLFW/glfw3.h>
-
-#include <vector>
-#include <iostream>
-#include <random>
-
-#include "input.h"
-#include "camera.hpp"
-#include "shader.hpp"
-#include "meshgeometry.hpp"
-#include "meshutils.hpp"
-#include "databuffer.hpp"
-
 bool Engine::initialize()
 {
     bool wantsFullscreen = false;
