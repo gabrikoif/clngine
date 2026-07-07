@@ -45,7 +45,6 @@ bool Engine::initialize()
         return false;
     }
 
-
     glfwMakeContextCurrent(window);
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
     glfwSetCursorPosCallback(window, mouse_callback);
@@ -74,42 +73,35 @@ bool Engine::initialize()
 
 void Engine::createAndLoad()
 {
-    Mesh sphere = MeshGen::CreateCube(1.0f);
+    Mesh ballMesh = MeshGen::CreateSphere(1.0f);
+    MeshUtils::GLMesh GPUBallMesh = MeshUtils::uploadToGPU(ballMesh.vertices, ballMesh.indices);
 
-    MeshUtils::GLMesh readymesh = MeshUtils::uploadToGPU(sphere.vertices, sphere.indices);
-
-    // ==========================================
-    // INSTANCING SETUP START
-    // ==========================================
-    const int NUM_SPHERES = 10000;
-    const float BOUNDS = 50.0f; // Range from -25 to +25
-
+    m_meshCount = 10000;
+    m_bounds = 50.0f;
     std::random_device rd;
     std::mt19937 gen(rd());
-    std::uniform_real_distribution<float> dis(-BOUNDS, BOUNDS);
+    std::uniform_real_distribution<float> bounds(-m_bounds, m_bounds);
     std::uniform_real_distribution<float> zero_to_one(0.0f, 1.0f);
 
     // 1. Generate initial random positions / matrices on CPU
     std::vector<glm::mat4> sphereMatrices;
-    sphereMatrices.reserve(NUM_SPHERES);
-    for (int i = 0; i < NUM_SPHERES; ++i)
+    sphereMatrices.reserve(m_meshCount);
+    for (int i = 0; i < m_meshCount; ++i)
     {
         glm::mat4 model = glm::mat4(1.0f);
-        model = glm::translate(model, glm::vec3(dis(gen), dis(gen), dis(gen)));
-        // model = glm::rotate(model, 45.0f, glm::vec3(zero_to_one(gen), zero_to_one(gen), zero_to_one(gen)));
-        // When time comes and I have texcoords
+        model = glm::translate(model, glm::vec3(bounds(gen), bounds(gen), bounds(gen)));
         sphereMatrices.push_back(model);
     }
 
     std::vector<glm::vec3> sphereColors;
-    sphereColors.reserve(NUM_SPHERES);
-    for (int i = 0; i < NUM_SPHERES; ++i)
+    sphereColors.reserve(m_meshCount);
+    for (int i = 0; i < m_meshCount; ++i)
     {
         glm::vec3 color = glm::vec3(zero_to_one(gen), zero_to_one(gen), zero_to_one(gen));
         sphereColors.push_back(color);
     }
 
-    m_mesh = readymesh;
+    m_mesh = GPUBallMesh;
     m_colors = std::move(sphereColors);
     m_models = std::move(sphereMatrices);
 
@@ -120,7 +112,6 @@ void Engine::createAndLoad()
     modelConfig.divisor = 1;
     modelConfig.type = GL_FLOAT;
 
-
     m_buffers.push_back(
         std::make_unique<DataBuffer<glm::mat4>>(m_mesh.VAO, m_models, modelConfig, false));
 
@@ -130,85 +121,28 @@ void Engine::createAndLoad()
     colorConfig.divisor = 1;
     colorConfig.type = GL_FLOAT;
 
-
     m_buffers.push_back(
         std::make_unique<DataBuffer<glm::vec3>>(m_mesh.VAO, m_colors, colorConfig, true));
+    
+    // Data done.
 
     m_camera.fov = 103.0f;
     m_camera.farPlane = 1500.0f;
     m_camera.nearPlane = 1.0f;
 
     m_shader.load("shader/vertex.glsl", "shader/fragment.glsl");
+    // Shaders and camera ready.
 }
 
 void Engine::run()
 {
-    const int NUM_SPHERES = 10000;
-    std::random_device rd;
-    std::mt19937 gen(rd());
-    std::uniform_real_distribution zero_to_one(0.0f, 1.0f);
-    int width, height;
-    bool needsGPUUpdate = true;
     while (!glfwWindowShouldClose(m_window))
     {
-        // Fetch fresh dimensions in case of resizing
-        glfwGetFramebufferSize(m_window, &width, &height);
-        glViewport(0, 0, width, height);
+        Engine::processInput();
 
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        Engine::update();
 
-        if (glfwGetKey(m_window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
-        {
-            break;
-        }
-
-        handle_input(m_window);
-
-        if (glfwGetKey(m_window, GLFW_KEY_R) == GLFW_PRESS)
-        {
-
-            for (int i = 0; i < NUM_SPHERES; ++i)
-            {
-                m_colors[i] = glm::vec3(zero_to_one(gen), zero_to_one(gen), zero_to_one(gen));
-            } 
-            needsGPUUpdate = true;
-        }
-
-        float aspectRatio = (float)width / (float)height;
-
-        // Get camera matrices
-        glm::mat4 view = m_camera.genView();
-        glm::mat4 projection = m_camera.genProj(aspectRatio);
-
-        // UPDATE PHASE (PHYSICS ON THE CPU)
-        // TODO: Add Physics class in physics.cpp so that:
-        // you only have to write:
-        // world.update();
-
-        // 2. UPLOAD PHASE (CPU -> GPU)
-        if (needsGPUUpdate)
-        {
-            m_buffers[0]->updateGPU(m_models.data(), m_models.size() * sizeof(glm::mat4));
-            m_buffers[1]->updateGPU(m_colors.data(), m_colors.size() * sizeof(glm::vec3));
-            needsGPUUpdate = false;
-        }
-
-        // 3. RENDER PHASE (GPU)
-        m_shader.use();
-        m_shader.setMat4("view", view);
-        m_shader.setMat4("projection", projection);
-
-        glBindVertexArray(m_mesh.VAO);
-        glDrawElementsInstanced(
-            GL_TRIANGLES,
-            m_mesh.indexCount, // Assuming GLMesh stores your index count
-            GL_UNSIGNED_INT,
-            0,
-            NUM_SPHERES);
-        glBindVertexArray(0);
-
-        glfwSwapBuffers(m_window);
-        glfwPollEvents();
+        Engine::render();
     }
 }
 
@@ -216,4 +150,72 @@ void Engine::shutdown()
 {
     MeshUtils::deleteFromGPU(m_mesh);
     glfwTerminate();
+}
+
+// Private Methods
+
+void Engine::processInput()
+{
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_real_distribution zero_to_one(0.0f, 1.0f);
+
+    if (glfwGetKey(m_window, GLFW_KEY_R) == GLFW_PRESS)
+    {
+
+        for (int i = 0; i < m_meshCount; ++i)
+        {
+            m_colors[i] = glm::vec3(zero_to_one(gen), zero_to_one(gen), zero_to_one(gen));
+        }
+        m_needsGPUUpdate = true;
+    }
+
+    if (glfwGetKey(m_window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+    {
+        glfwSetWindowShouldClose(m_window, 1);
+    }
+
+    handle_input(m_window);
+}
+
+void Engine::update(float DeltaTime)
+{
+    // TODO: Add physics CPU part here.
+    // Ideally, m_world.update(DeltaTime);
+
+    if (m_needsGPUUpdate)
+    {
+        m_buffers[0]->updateGPU(m_models.data(), m_models.size() * sizeof(glm::mat4));
+        m_buffers[1]->updateGPU(m_colors.data(), m_colors.size() * sizeof(glm::vec3));
+        m_needsGPUUpdate = false;
+    }
+}
+
+void Engine::render()
+{
+    glfwGetFramebufferSize(m_window, &m_width, &m_height);
+    glViewport(0, 0, m_width, m_height);
+
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    m_shader.use();
+
+    float aspectRatio = (float)m_width / (float)m_height;
+    glm::mat4 view = m_camera.genView();
+    glm::mat4 projection = m_camera.genProj(aspectRatio);
+
+    m_shader.setMat4("view", view);
+    m_shader.setMat4("projection", projection);
+
+    glBindVertexArray(m_mesh.VAO);
+    glDrawElementsInstanced(
+        GL_TRIANGLES,
+        m_mesh.indexCount, // Assuming GLMesh stores your index count
+        GL_UNSIGNED_INT,
+        0,
+        m_meshCount);
+    glBindVertexArray(0);
+
+    glfwSwapBuffers(m_window);
+    glfwPollEvents();
 }

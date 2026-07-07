@@ -27,14 +27,21 @@ public:
 
 private:
     void processInput();
-    void update(float deltaTime);
+    void update(float deltaTime = 0.016f);
     void render();
 
     bool m_isRunning;
     GLFWwindow* m_window;
+    int m_width;
+    int m_height;
+
     MeshUtils::GLMesh m_mesh;
+    int m_meshCount;
+    float m_bounds;
+
     GLuint m_vao;
     GLuint m_vbo;
+    bool m_needsGPUUpdate = true;
 
     Shader m_shader;
     Camera m_camera;
