@@ -13,7 +13,7 @@
 #include "shader.hpp"
 #include "meshgeometry.hpp"
 #include "meshutils.hpp"
-#include "databuffer.hpp"
+#include "data.hpp"
 
 class Engine
 {
@@ -47,7 +47,8 @@ private:
     Shader m_shader;
     Camera m_camera;
 
-    std::vector<std::unique_ptr<IDataBuffer>> m_buffers;
+    GLBuffer<glm::mat4> m_modelbuffer;
+    GLBuffer<glm::vec3> m_colorbuffer;
 
     std::vector<glm::vec3> m_colors;
     std::vector<glm::mat4> m_models;

@@ -92,25 +92,23 @@ void Engine::createAndLoad()
     m_models = std::move(sphereMatrices);
 
     // 2. Create the VBO to hold instance data on GPU
-    AttribConfig modelConfig;
-    modelConfig.slot = 3;
-    modelConfig.count = 16;
-    modelConfig.divisor = 1;
-    modelConfig.type = GL_FLOAT;
 
-    m_buffers.push_back(
-        std::make_unique<DataBuffer<glm::mat4>>(m_mesh.VAO, m_models, modelConfig, false));
+    m_colorbuffer.create(BufferUsage::Dynamic);
+    m_modelbuffer.create();
 
-    AttribConfig colorConfig;
-    colorConfig.slot = 7;
-    colorConfig.count = 3;
-    colorConfig.divisor = 1;
-    colorConfig.type = GL_FLOAT;
+    m_colorbuffer.upload(m_colors);
+    m_modelbuffer.upload(m_models);
 
-    m_buffers.push_back(
-        std::make_unique<DataBuffer<glm::vec3>>(m_mesh.VAO, m_colors, colorConfig, true));
-    
-    // Data done.
+    glBindVertexArray(m_mesh.VAO);
+
+    m_colorbuffer.link_attribute(7, 3, GL_FLOAT);
+    m_colorbuffer.set_instanced(7);
+
+    m_modelbuffer.link_attribute(3);
+    m_modelbuffer.set_instanced(3);
+
+    glBindVertexArray(0);
+
 
     m_camera.fov = 103.0f;
     m_camera.farPlane = 1500.0f;
@@ -169,8 +167,9 @@ void Engine::update(float DeltaTime)
 
     if (m_needsGPUUpdate)
     {
-        m_buffers[0]->updateGPU(m_models.data(), m_models.size() * sizeof(glm::mat4));
-        m_buffers[1]->updateGPU(m_colors.data(), m_colors.size() * sizeof(glm::vec3));
+        m_colorbuffer.update_sub_data(m_colors, 0);
+        m_modelbuffer.update_sub_data(m_models, 0);
+
         m_needsGPUUpdate = false;
     }
 }
