@@ -167,8 +167,8 @@ void Engine::update(float DeltaTime)
 
     if (m_needsGPUUpdate)
     {
-        m_colorbuffer.upload(m_colors);
-        m_modelbuffer.upload(m_models);
+        m_colorbuffer.update_sub_data(m_colors, 0);
+        m_modelbuffer.update_sub_data(m_models, 0);
 
         m_needsGPUUpdate = false;
     }
