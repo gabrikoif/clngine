@@ -43,9 +43,11 @@ bool Engine::initialize()
         std::cout << "GLAD initialization error." << std::endl;
         return false;
     }
-    glClearColor(0.15f, 0.15f, 0.15f, 1.0f);
+    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
     // Background color.
     glEnable(GL_DEPTH_TEST);
+    glEnable(GL_CULL_FACE);
+    glCullFace(GL_BACK);
 
     int width, height;
     glfwGetFramebufferSize(window, &width, &height);
@@ -59,7 +61,7 @@ bool Engine::initialize()
 
 void Engine::createAndLoad()
 {
-    Mesh ballMesh = MeshGen::CreateSphere(1.0f);
+    Mesh ballMesh = MeshGen::CreateCube(1.0f);
     MeshUtils::GLMesh GPUBallMesh = MeshUtils::uploadToGPU(ballMesh.vertices, ballMesh.indices);
 
     m_meshCount = 10000;
@@ -109,10 +111,9 @@ void Engine::createAndLoad()
 
     glBindVertexArray(0);
 
-
     m_camera.fov = 103.0f;
     m_camera.farPlane = 1500.0f;
-    m_camera.nearPlane = 1.0f;
+    m_camera.nearPlane = 0.05f;
 
     m_shader.load("shader/vertex.glsl", "shader/fragment.glsl");
     // Shaders and camera ready.
@@ -189,6 +190,13 @@ void Engine::render()
 
     m_shader.setMat4("view", view);
     m_shader.setMat4("projection", projection);
+
+    glm::vec3 lightPos = glm::vec3(10.0f);
+    glm::vec3 lightColor = glm::vec3(1.0f); // White
+    glm::vec3 viewPos = m_camera.cameraPos;
+    m_shader.setVec3("lightPos", lightPos);
+    m_shader.setVec3("lightColor", lightColor);
+    m_shader.setVec3("viewPos", viewPos);
 
     glBindVertexArray(m_mesh.VAO);
     glDrawElementsInstanced(
