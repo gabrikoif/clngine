@@ -13,7 +13,7 @@ set(PROJECT_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/src/engine.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/input.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/shader.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/gpumesh.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/meshutils.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/meshgeometry.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/camera.cpp
 )
@@ -83,7 +83,7 @@ add_executable(${PROJECT_NAME}
     ${CMAKE_CURRENT_SOURCE_DIR}/dependencies/glad/glad.c
 )
 
-file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/shader 
+file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/shaders 
      DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 
 # 7. Link third-party libraries and drivers to your application
