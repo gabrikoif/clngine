@@ -11,19 +11,19 @@ namespace MeshUtils
         mesh.indexCount = indices.size();
 
         // 1. Generate IDs
-        glGenVertexArrays(1, &mesh.VAO);
-        glGenBuffers(1, &mesh.VBO);
-        glGenBuffers(1, &mesh.EBO);
+        glGenVertexArrays(1, &mesh.vao);
+        glGenBuffers(1, &mesh.vbo);
+        glGenBuffers(1, &mesh.ebo);
 
-        // 2. Bind VAO first
-        glBindVertexArray(mesh.VAO);
+        // 2. Bind vao first
+        glBindVertexArray(mesh.vao);
 
-        // 3. Upload Vertex Data to VBO
-        glBindBuffer(GL_ARRAY_BUFFER, mesh.VBO);
+        // 3. Upload Vertex Data to vbo
+        glBindBuffer(GL_ARRAY_BUFFER, mesh.vbo);
         glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(Vertex), vertices.data(), GL_STATIC_DRAW);
 
-        // 4. Upload Index Data to EBO
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh.EBO);
+        // 4. Upload Index Data to ebo
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh.ebo);
         glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned int), indices.data(), GL_STATIC_DRAW);
 
         // 5. Configure Vertex Attributes (Assuming layout 0 = Pos, 1 = Normal, 2 = TexCoords)
@@ -40,10 +40,10 @@ namespace MeshUtils
         glEnableVertexAttribArray(2);
         glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void *)offsetof(Vertex, texCoords));
 
-        // 6. Unbind VAO (safely breaks the binding so nothing else accidentally changes it)
+        // 6. Unbind vao (safely breaks the binding so nothing else accidentally changes it)
         glBindVertexArray(0);
 
-        // Unbind buffers AFTER unbinding VAO
+        // Unbind buffers AFTER unbinding vao
         glBindBuffer(GL_ARRAY_BUFFER, 0);
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
@@ -52,14 +52,14 @@ namespace MeshUtils
 
     void deleteFromGPU(GLMesh &mesh)
     {
-        glDeleteVertexArrays(1, &mesh.VAO);
-        glDeleteBuffers(1, &mesh.VBO);
-        glDeleteBuffers(1, &mesh.EBO);
+        glDeleteVertexArrays(1, &mesh.vao);
+        glDeleteBuffers(1, &mesh.vbo);
+        glDeleteBuffers(1, &mesh.ebo);
 
         // Reset IDs to avoid accidental reuse
-        mesh.VAO = 0;
-        mesh.VBO = 0;
-        mesh.EBO = 0;
+        mesh.vao = 0;
+        mesh.vbo = 0;
+        mesh.ebo = 0;
         mesh.indexCount = 0;
     }
 }
