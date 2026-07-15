@@ -57,12 +57,16 @@ bool Engine::initialize()
 
 void Engine::createAndLoad()
 {
-    m_camera = Camera(10.0f);
+    m_camera = Camera(10.0f); // Speed(m/s)
     globalCamPtr = &m_camera;
-    Mesh sphere = MeshGen::CreateSphere(0.05f);
-    MeshUtils::GLMesh GLSphere = MeshUtils::uploadToGPU(sphere.vertices, sphere.indices);
+
+    // Constants for user to define(instancing)
     int instance_count = 10000;
     float bound = 100.0f;
+    float radius = 0.05f;
+
+    Mesh sphere = MeshGen::CreateSphere(radius);
+    MeshUtils::GLMesh GLSphere = MeshUtils::uploadToGPU(sphere.vertices, sphere.indices);
     m_group.initialize(GLSphere, instance_count, bound);
 
     m_shader.load("shaders/vertex.glsl", "shaders/fragment.glsl");
