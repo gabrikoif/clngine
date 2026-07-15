@@ -8,12 +8,12 @@ class Camera
 public:
     // Constructor with default argument
     Camera(
+        float p_speed = 4.0f,
         glm::vec3 p_pos = glm::vec3(0.0f),
         glm::vec3 p_dir = glm::vec3(0.0f, 0.0f, -1.0f),
         float p_fov = 100.0f,
         float p_nearPlane = 0.1f,
         float p_farPlane = 1000.0f,
-        float p_speed = 4.0f,
         bool p_fly = true);
 
     glm::vec3 m_pos;
@@ -27,8 +27,8 @@ public:
     void handleKeyboard(bool w, bool a, bool s, bool d, float DeltaTime = 0.016f);
 
 private:
-    float yaw;
-    float pitch;
+    float yaw = -90.0f;
+    float pitch = 0.0f;
     float m_fov;
     float m_nearPlane;
     float m_farPlane;
