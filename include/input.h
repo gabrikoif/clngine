@@ -5,6 +5,6 @@
 
 void mouse_callback(GLFWwindow *window, double xpos, double ypos);
 void framebuffer_size_callback(GLFWwindow *window, int width, int height);
-void handle_input(GLFWwindow *window);
+int glfw_getch_nonblocking(GLFWwindow* window);
 
-extern Camera *globalCamPointer;
+extern Camera* globalCamPtr;
