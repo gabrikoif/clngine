@@ -1,7 +1,7 @@
 #include "input.h"
 
-static float lastX = 400.0;
-static float lastY = 300.0;
+static float lastX = 0.0f;
+static float lastY = 0.0f;
 static bool firstMouse = true;
 
 Camera* globalCamPtr = nullptr;
