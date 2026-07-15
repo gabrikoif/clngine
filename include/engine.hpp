@@ -22,7 +22,7 @@ public:
     void shutdown();
 
 private:
-    void processInput();
+    void processInput(float deltaTime = 0.016f);
     void update(float deltaTime = 0.016f);
     void render();
 
