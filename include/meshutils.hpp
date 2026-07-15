@@ -6,9 +6,9 @@
 namespace MeshUtils {
     // A container to hold our OpenGL buffer IDs and draw count
     struct GLMesh {
-        unsigned int VAO = 0;
-        unsigned int VBO = 0;
-        unsigned int EBO = 0;
+        unsigned int vao = 0;
+        unsigned int vbo = 0;
+        unsigned int ebo = 0;
         unsigned int indexCount = 0;
     };
 
