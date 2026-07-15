@@ -52,14 +52,14 @@ bool Engine::initialize()
     // Background color.
     glEnable(GL_DEPTH_TEST);
 
-
-    globalCamPtr = &m_camera;
     return true;
 }
 
 void Engine::createAndLoad()
 {
-    Mesh sphere = MeshGen::CreateSphere(1.0f);
+    m_camera = Camera(10.0f);
+    globalCamPtr = &m_camera;
+    Mesh sphere = MeshGen::CreateSphere(0.05f);
     MeshUtils::GLMesh GLSphere = MeshUtils::uploadToGPU(sphere.vertices, sphere.indices);
     int instance_count = 10000;
     float bound = 100.0f;
@@ -86,14 +86,15 @@ void Engine::shutdown()
 
 // Private Methods
 
-void Engine::processInput()
+void Engine::processInput(float deltaTime)
 {
     int key = glfw_getch_nonblocking(m_window);
     m_camera.handleKeyboard(
         isPressed(GLFW_KEY_W),
         isPressed(GLFW_KEY_A),
         isPressed(GLFW_KEY_S),
-        isPressed(GLFW_KEY_D));
+        isPressed(GLFW_KEY_D),
+        deltaTime);
     switch (key)
     {
     case -1:
