@@ -12,7 +12,7 @@ public:
 private:
   void apply(GameObj& curr, float dt);
   void handleBoundCollision(GameObj& curr);
-  void Physics::handleObjsCollision(GameObj& obj1, GameObj& obj2);
+  void handleObjsCollision(GameObj& obj1, GameObj& obj2);
 
   // World constants
   float gravity;
