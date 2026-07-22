@@ -25,6 +25,8 @@ public:
     m_mass = p_mass;
     m_radius = p_radius;
 
+    m_bounds = boundsRange;
+
     m_models.reserve(m_count);
     m_colors.reserve(m_count);
     m_objs.reserve(m_count);
@@ -33,7 +35,7 @@ public:
     std::mt19937 gen(rd());
     std::uniform_real_distribution<float> bounds(-boundsRange, boundsRange);
     std::uniform_real_distribution<float> zero_to_one(0.0f, 1.0f);
-    std::uniform_real_distribution<float> radii(1.0f, 5.0f);
+    std::uniform_real_distribution<float> radii(0.01 * boundsRange, 0.1 * boundsRange);
     std::uniform_real_distribution<float> speed(-50.0f, 50.0f);
 
     // Generate initial data
@@ -75,9 +77,9 @@ public:
   {
     std::random_device rd;
     std::mt19937 gen(rd());
-    std::uniform_real_distribution<float> bounds(-100.0f, 100.0f);
+    std::uniform_real_distribution<float> bounds(-m_bounds, m_bounds);
     std::uniform_real_distribution<float> zero_to_one(0.0f, 1.0f);
-    std::uniform_real_distribution<float> radii(1.0f, 5.0f);
+    std::uniform_real_distribution<float> radii(0.01 * m_bounds, 0.1 * m_bounds);
     std::uniform_real_distribution<float> speed(-50.0f, 50.0f);
 
     // Generate initial data
@@ -85,7 +87,7 @@ public:
     {
       float radius = radii(gen);
       float mass = 5 * radius;
-      GameObj& curr_obj = m_objs[i];
+      GameObj &curr_obj = m_objs[i];
       curr_obj.pos = glm::vec3(bounds(gen), abs(bounds(gen)), bounds(gen));
       curr_obj.vel = glm::vec3(speed(gen), speed(gen), speed(gen));
       glm::mat4 model = glm::translate(glm::mat4(1.0f), curr_obj.pos);
@@ -102,7 +104,7 @@ public:
     int i = 0;
     if (m_models.size() == 0)
       return;
-    for (auto& obj : m_objs)
+    for (auto &obj : m_objs)
     {
       glm::mat4 transform = glm::mat4(1.0f);
       transform = glm::translate(transform, obj.pos);
@@ -141,7 +143,7 @@ public:
     // destructor
   }
 
-  std::vector<GameObj>& getObjs() { return m_objs; }
+  std::vector<GameObj> &getObjs() { return m_objs; }
 
 private:
   MeshUtils::GLMesh m_mesh;
@@ -151,6 +153,8 @@ private:
   float m_radius;
   float m_mass;
   std::vector<GameObj> m_objs;
+
+  float m_bounds;
 
   // CPU Mirror
   std::vector<glm::mat4> m_models;

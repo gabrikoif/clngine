@@ -16,9 +16,9 @@ bool Engine::initialize()
   glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
   glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-  GLFWmonitor* monitor = glfwGetPrimaryMonitor();
-  const GLFWvidmode* mode = glfwGetVideoMode(monitor);
-  GLFWwindow* window =
+  GLFWmonitor *monitor = glfwGetPrimaryMonitor();
+  const GLFWvidmode *mode = glfwGetVideoMode(monitor);
+  GLFWwindow *window =
       glfwCreateWindow(mode->width, mode->height, "CLngine",
                        (wantsFullscreen) ? monitor : nullptr, nullptr);
 
@@ -54,14 +54,15 @@ bool Engine::initialize()
 
 void Engine::createAndLoad()
 {
-  m_camera = Camera(10.0f, glm::vec3(10.0f, 10.0f, 0.0f)); // Speed(m/s)
-  globalCamPtr = &m_camera;
-
   // Constants for user to define(instancing)
   int instance_count = 50;
   float bound = 50.0f;
   float mass = 1.0f;
   float radius = 0.5f;
+  // * Redundant as of right now but kept just in case
+
+  m_camera = Camera(20.0f, glm::vec3(1.5 * bound, 0.5 * bound, 0.0f)); // Speed(m/s)
+  globalCamPtr = &m_camera;
 
   m_world = Physics(bound, 9.81, 0.8);
 
