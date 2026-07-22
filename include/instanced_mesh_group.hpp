@@ -33,15 +33,19 @@ public:
     std::mt19937 gen(rd());
     std::uniform_real_distribution<float> bounds(-boundsRange, boundsRange);
     std::uniform_real_distribution<float> zero_to_one(0.0f, 1.0f);
+    std::uniform_real_distribution<float> radii(1.0f, 5.0f);
     std::uniform_real_distribution<float> speed(-50.0f, 50.0f);
 
     // Generate initial data
     for (int i = 0; i < m_count; ++i)
     {
-      GameObj curr_obj(m_mass, m_radius);
+      float radius = radii(gen);
+      float mass = 5 * radius;
+      GameObj curr_obj(mass, radius);
       curr_obj.pos = glm::vec3(bounds(gen), abs(bounds(gen)), bounds(gen));
       curr_obj.vel = glm::vec3(speed(gen), speed(gen), speed(gen));
       glm::mat4 model = glm::translate(glm::mat4(1.0f), curr_obj.pos);
+      model = glm::scale(model, glm::vec3(radius));
       m_models.push_back(model);
       m_colors.push_back(
           glm::vec3(zero_to_one(gen), zero_to_one(gen), zero_to_one(gen)));
@@ -67,14 +71,26 @@ public:
     glBindVertexArray(0);
   }
 
-  void randomizeColors()
+  void rerun()
   {
     std::random_device rd;
     std::mt19937 gen(rd());
+    std::uniform_real_distribution<float> bounds(-100.0f, 100.0f);
     std::uniform_real_distribution<float> zero_to_one(0.0f, 1.0f);
+    std::uniform_real_distribution<float> radii(1.0f, 5.0f);
+    std::uniform_real_distribution<float> speed(-50.0f, 50.0f);
 
+    // Generate initial data
     for (int i = 0; i < m_count; ++i)
     {
+      float radius = radii(gen);
+      float mass = 5 * radius;
+      GameObj& curr_obj = m_objs[i];
+      curr_obj.pos = glm::vec3(bounds(gen), abs(bounds(gen)), bounds(gen));
+      curr_obj.vel = glm::vec3(speed(gen), speed(gen), speed(gen));
+      glm::mat4 model = glm::translate(glm::mat4(1.0f), curr_obj.pos);
+      model = glm::scale(model, glm::vec3(radius));
+      m_models[i] = model;
       m_colors[i] =
           glm::vec3(zero_to_one(gen), zero_to_one(gen), zero_to_one(gen));
     }
@@ -90,6 +106,7 @@ public:
     {
       glm::mat4 transform = glm::mat4(1.0f);
       transform = glm::translate(transform, obj.pos);
+      transform = glm::scale(transform, glm::vec3(obj.radius));
       m_models[i] = transform;
       ++i;
     }

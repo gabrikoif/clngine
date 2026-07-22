@@ -58,14 +58,14 @@ void Engine::createAndLoad()
   globalCamPtr = &m_camera;
 
   // Constants for user to define(instancing)
-  int instance_count = 1000;
-  float bound = 100.0f;
+  int instance_count = 50;
+  float bound = 50.0f;
   float mass = 1.0f;
-  float radius = 1.0f;
+  float radius = 0.5f;
 
   m_world = Physics(bound, 9.81, 0.8);
 
-  Mesh sphere = MeshGen::CreateSphere(radius);
+  Mesh sphere = MeshGen::CreateSphere(1.0f);
   MeshUtils::GLMesh GLSphere =
       MeshUtils::uploadToGPU(sphere.vertices, sphere.indices);
   m_group.initialize(GLSphere, instance_count, bound, mass, radius);
@@ -106,6 +106,9 @@ void Engine::processInput(float deltaTime)
 
   case GLFW_KEY_SPACE:
     m_camera.m_fly = 1 - m_camera.m_fly;
+    break;
+  case GLFW_KEY_R:
+    m_group.rerun();
     break;
   case GLFW_KEY_ESCAPE:
     shutdown();

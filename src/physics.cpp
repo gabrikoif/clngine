@@ -27,7 +27,7 @@ void Physics::apply(GameObj& curr, float dt)
 {
   curr.acl = glm::vec3(0.0f);
   const glm::vec3 g = glm::vec3(0.0f, -gravity, 0.0f);
-  const float epsilon = 0.001f;
+  const float epsilon = 0.1f;
   bool onGround = (curr.pos.y - curr.radius <= 0.0f);
   bool atRest = (glm::dot(curr.vel, curr.vel) <= (epsilon * epsilon));
 
