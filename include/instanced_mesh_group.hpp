@@ -15,6 +15,7 @@ class InstancedMeshGroup
 public:
   InstancedMeshGroup() = default;
   ~InstancedMeshGroup() { destroy(); }
+  float m_bounds;
 
   void initialize(MeshUtils::GLMesh baseMesh, int instanceCount,
                   float boundsRange, float p_mass, float p_radius)
@@ -41,7 +42,7 @@ public:
     // Generate initial data
     for (int i = 0; i < m_count; ++i)
     {
-      float radius = radii(gen);
+      float radius = m_radius;
       float mass = 5 * radius;
       GameObj curr_obj(mass, radius);
       curr_obj.pos = glm::vec3(bounds(gen), abs(bounds(gen)), bounds(gen));
@@ -153,8 +154,6 @@ private:
   float m_radius;
   float m_mass;
   std::vector<GameObj> m_objs;
-
-  float m_bounds;
 
   // CPU Mirror
   std::vector<glm::mat4> m_models;
