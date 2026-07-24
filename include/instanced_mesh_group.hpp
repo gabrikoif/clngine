@@ -43,8 +43,8 @@ public:
     // Generate initial data
     for (int i = 0; i < m_count; ++i)
     {
-      float radius = radii(gen);
-      float mass = 5 * radius;
+      float radius = m_radius;
+      float mass = 2 * radius;
       GameObj curr_obj(mass, radius);
       curr_obj.pos = glm::vec3(bounds(gen), abs(bounds(gen)), bounds(gen));
       curr_obj.vel = glm::vec3(speed(gen), speed(gen), speed(gen));
@@ -88,9 +88,9 @@ public:
     // Generate initial data
     for (int i = 0; i < m_count; ++i)
     {
-      float radius = radii(gen);
+      float radius = m_radius;
       float mass = 2 * radius;
-      GameObj &curr_obj = m_objs[i];
+      GameObj& curr_obj = m_objs[i];
       curr_obj.pos = glm::vec3(bounds(gen), abs(bounds(gen)), bounds(gen));
       curr_obj.vel = glm::vec3(speed(gen), speed(gen), speed(gen));
       glm::mat4 model = glm::translate(glm::mat4(1.0f), curr_obj.pos);
@@ -107,7 +107,7 @@ public:
     int i = 0;
     if (m_models.size() == 0)
       return;
-    for (auto &obj : m_objs)
+    for (auto& obj : m_objs)
     {
       glm::mat4 transform = glm::mat4(1.0f);
       transform = glm::translate(transform, obj.pos);
@@ -146,7 +146,7 @@ public:
     // destructor
   }
 
-  std::vector<GameObj> &getObjs() { return m_objs; }
+  std::vector<GameObj>& getObjs() { return m_objs; }
 
 private:
   MeshUtils::GLMesh m_mesh;

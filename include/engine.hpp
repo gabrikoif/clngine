@@ -36,9 +36,13 @@ private:
   int m_width, m_height;
 
   Camera m_camera;
+
   Shader m_shader;
+  Shader m_indep_shader;
 
   InstancedMeshGroup m_group;
+
+  MeshUtils::GLMesh m_cube;
 
   Physics m_world;
 };

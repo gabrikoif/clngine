@@ -38,7 +38,7 @@ void Physics::apply(GameObj& curr, float dt)
   curr.acl = glm::vec3(0.0f);
   const glm::vec3 g = glm::vec3(0.0f, -gravity, 0.0f);
   const float epsilon = 0.1f;
-  bool onGround = (curr.pos.y - curr.radius <= 0.0f);
+  bool onGround = (curr.pos.y - curr.radius <= -bounds);
   bool atRest = (glm::dot(curr.vel, curr.vel) <= (epsilon * epsilon));
 
   // Stop moving if at rest
@@ -64,9 +64,9 @@ void Physics::handleBoundCollision(GameObj& curr)
   const float r = curr.radius;
   bool collision = false;
 
-  if (curr.pos.y - r <= 0.0f)
+  if (curr.pos.y - r <= -bounds)
   {
-    curr.pos.y = r;
+    curr.pos.y = -bounds + r;
     curr.vel.y = -curr.vel.y;
     collision = true;
   }

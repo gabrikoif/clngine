@@ -16,9 +16,9 @@ bool Engine::initialize()
   glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
   glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-  GLFWmonitor *monitor = glfwGetPrimaryMonitor();
-  const GLFWvidmode *mode = glfwGetVideoMode(monitor);
-  GLFWwindow *window =
+  GLFWmonitor* monitor = glfwGetPrimaryMonitor();
+  const GLFWvidmode* mode = glfwGetVideoMode(monitor);
+  GLFWwindow* window =
       glfwCreateWindow(mode->width, mode->height, "CLngine",
                        (wantsFullscreen) ? monitor : nullptr, nullptr);
 
@@ -56,22 +56,27 @@ void Engine::createAndLoad()
 {
   // Constants for user to define(instancing)
   int instance_count = 50;
-  float bound = 50.0f;
+  float bound = 2.0f;
   float mass = 1.0f;
-  float radius = 0.5f;
+  float radius = 0.05f;
   // * Redundant as of right now but kept just in case
 
-  m_camera = Camera(20.0f, glm::vec3(1.5 * bound, 0.5 * bound, 0.0f)); // Speed(m/s)
+  m_camera =
+      Camera(20.0f, glm::vec3(1.5 * bound, 0.5 * bound, 0.0f)); // Speed(m/s)
   globalCamPtr = &m_camera;
 
-  m_world = Physics(bound, 9.81, 0.8);
+  m_world = Physics(bound, 9.81f, 0.7f, 0.8f);
 
   Mesh sphere = MeshGen::CreateSphere(1.0f);
   MeshUtils::GLMesh GLSphere =
       MeshUtils::uploadToGPU(sphere.vertices, sphere.indices);
   m_group.initialize(GLSphere, instance_count, bound, mass, radius);
 
+  Mesh cube = MeshGen::CreateCube(2.0f);
+  m_cube = MeshUtils::uploadToGPU(cube.vertices, cube.indices);
+
   m_shader.load("shaders/vertex.glsl", "shaders/fragment.glsl");
+  m_indep_shader.load("shaders/indepVert.glsl", "shaders/indepFrag.glsl");
 }
 
 void Engine::run()
@@ -156,6 +161,23 @@ void Engine::render()
   m_shader.setMat4("projection", projection);
 
   m_group.draw();
+
+  // Now the bounds
+  m_indep_shader.use();
+
+  glm::mat4 model =
+      glm::scale(glm::mat4(1.0f), glm::vec3(m_group.m_bounds, m_group.m_bounds,
+                                            m_group.m_bounds));
+  m_indep_shader.setMat4("model", model);
+  m_indep_shader.setMat4("view", view);
+  m_indep_shader.setMat4("projection", projection);
+  m_indep_shader.setVec3("uColor", glm::vec3(1.0f));
+
+  glBindVertexArray(m_cube.vao);
+
+  glDrawElements(GL_LINE_LOOP, m_cube.indexCount, GL_UNSIGNED_INT, (void*)0);
+
+  glBindVertexArray(0);
 
   glfwSwapBuffers(m_window);
   glfwPollEvents();
