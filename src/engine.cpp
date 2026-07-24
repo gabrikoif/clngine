@@ -64,7 +64,7 @@ void Engine::createAndLoad()
   m_camera = Camera(20.0f, glm::vec3(1.5 * bound, 0.5 * bound, 0.0f)); // Speed(m/s)
   globalCamPtr = &m_camera;
 
-  m_world = Physics(bound, 9.81f);
+  m_world = Physics(bound, 9.81, 0.8);
 
   Mesh sphere = MeshGen::CreateSphere(1.0f);
   MeshUtils::GLMesh GLSphere =
