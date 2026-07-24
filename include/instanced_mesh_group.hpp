@@ -35,7 +35,8 @@ public:
     std::mt19937 gen(rd());
     std::uniform_real_distribution<float> bounds(-boundsRange, boundsRange);
     std::uniform_real_distribution<float> zero_to_one(0.0f, 1.0f);
-    std::uniform_real_distribution<float> radii(0.01 * boundsRange, 0.1 * boundsRange);
+    std::uniform_real_distribution<float> radii(0.01 * boundsRange,
+                                                0.1 * boundsRange);
     std::uniform_real_distribution<float> speed(-50.0f, 50.0f);
 
     // Generate initial data
@@ -79,15 +80,16 @@ public:
     std::mt19937 gen(rd());
     std::uniform_real_distribution<float> bounds(-m_bounds, m_bounds);
     std::uniform_real_distribution<float> zero_to_one(0.0f, 1.0f);
-    std::uniform_real_distribution<float> radii(0.01 * m_bounds, 0.1 * m_bounds);
+    std::uniform_real_distribution<float> radii(0.01 * m_bounds,
+                                                0.1 * m_bounds);
     std::uniform_real_distribution<float> speed(-50.0f, 50.0f);
 
     // Generate initial data
     for (int i = 0; i < m_count; ++i)
     {
       float radius = radii(gen);
-      float mass = 5 * radius;
-      GameObj &curr_obj = m_objs[i];
+      float mass = 2 * radius;
+      GameObj& curr_obj = m_objs[i];
       curr_obj.pos = glm::vec3(bounds(gen), abs(bounds(gen)), bounds(gen));
       curr_obj.vel = glm::vec3(speed(gen), speed(gen), speed(gen));
       glm::mat4 model = glm::translate(glm::mat4(1.0f), curr_obj.pos);
@@ -104,7 +106,7 @@ public:
     int i = 0;
     if (m_models.size() == 0)
       return;
-    for (auto &obj : m_objs)
+    for (auto& obj : m_objs)
     {
       glm::mat4 transform = glm::mat4(1.0f);
       transform = glm::translate(transform, obj.pos);
@@ -143,7 +145,7 @@ public:
     // destructor
   }
 
-  std::vector<GameObj> &getObjs() { return m_objs; }
+  std::vector<GameObj>& getObjs() { return m_objs; }
 
 private:
   MeshUtils::GLMesh m_mesh;
