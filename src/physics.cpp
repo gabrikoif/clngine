@@ -1,19 +1,25 @@
 #define GLM_ENABLE_EXPERIMENTAL
 #include "physics.hpp"
+
 #include <glm/gtx/norm.hpp>
 
-Physics::Physics(float p_bounds, float p_g, float p_bound_restitution, float p_obj_to_obj_restitution)
-    : bounds(p_bounds), gravity(p_g), bound_restitution(p_bound_restitution), obj_to_obj_restitution(p_obj_to_obj_restitution) { newBounds = bounds; };
+Physics::Physics(float p_bounds, float p_g, float p_bound_restitution,
+                 float p_obj_to_obj_restitution)
+    : bounds(p_bounds), gravity(p_g), bound_restitution(p_bound_restitution),
+      obj_to_obj_restitution(p_obj_to_obj_restitution)
+{
+  newBounds = bounds;
+};
 
 Physics::~Physics() {};
 
-void Physics::update(std::vector<GameObj> &p_objs, float deltaTime)
+void Physics::update(std::vector<GameObj>& p_objs, float deltaTime)
 {
   if (m_worldDataUpdated)
   {
     bounds = newBounds;
   }
-  for (auto &obj : p_objs)
+  for (auto& obj : p_objs)
   {
     apply(obj, deltaTime);
   }
@@ -27,7 +33,7 @@ void Physics::update(std::vector<GameObj> &p_objs, float deltaTime)
   }
 }
 
-void Physics::apply(GameObj &curr, float dt)
+void Physics::apply(GameObj& curr, float dt)
 {
   curr.acl = glm::vec3(0.0f);
   const glm::vec3 g = glm::vec3(0.0f, -gravity, 0.0f);
@@ -53,7 +59,7 @@ void Physics::apply(GameObj &curr, float dt)
   handleBoundCollision(curr);
 }
 
-void Physics::handleBoundCollision(GameObj &curr)
+void Physics::handleBoundCollision(GameObj& curr)
 {
   const float r = curr.radius;
   bool collision = false;
@@ -103,7 +109,7 @@ void Physics::handleBoundCollision(GameObj &curr)
   }
 }
 
-void Physics::handleObjsCollision(GameObj &objA, GameObj &objB)
+void Physics::handleObjsCollision(GameObj& objA, GameObj& objB)
 {
   // 1. Check for collision using squared distance (perf friendly!)
   glm::vec3 normal = objB.pos - objA.pos;
