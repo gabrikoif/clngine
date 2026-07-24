@@ -15,6 +15,7 @@ class InstancedMeshGroup
 public:
   InstancedMeshGroup() = default;
   ~InstancedMeshGroup() { destroy(); }
+  float m_bounds;
 
   void initialize(MeshUtils::GLMesh baseMesh, int instanceCount,
                   float boundsRange, float p_mass, float p_radius)
@@ -89,7 +90,7 @@ public:
     {
       float radius = radii(gen);
       float mass = 2 * radius;
-      GameObj& curr_obj = m_objs[i];
+      GameObj &curr_obj = m_objs[i];
       curr_obj.pos = glm::vec3(bounds(gen), abs(bounds(gen)), bounds(gen));
       curr_obj.vel = glm::vec3(speed(gen), speed(gen), speed(gen));
       glm::mat4 model = glm::translate(glm::mat4(1.0f), curr_obj.pos);
@@ -106,7 +107,7 @@ public:
     int i = 0;
     if (m_models.size() == 0)
       return;
-    for (auto& obj : m_objs)
+    for (auto &obj : m_objs)
     {
       glm::mat4 transform = glm::mat4(1.0f);
       transform = glm::translate(transform, obj.pos);
@@ -145,7 +146,7 @@ public:
     // destructor
   }
 
-  std::vector<GameObj>& getObjs() { return m_objs; }
+  std::vector<GameObj> &getObjs() { return m_objs; }
 
 private:
   MeshUtils::GLMesh m_mesh;
@@ -155,8 +156,6 @@ private:
   float m_radius;
   float m_mass;
   std::vector<GameObj> m_objs;
-
-  float m_bounds;
 
   // CPU Mirror
   std::vector<glm::mat4> m_models;

@@ -94,10 +94,10 @@ void Engine::shutdown()
 
 void Engine::processInput(float deltaTime)
 {
-  int key = glfw_getch_nonblocking(m_window);
   m_camera.handleKeyboard(isPressed(GLFW_KEY_W), isPressed(GLFW_KEY_A),
                           isPressed(GLFW_KEY_S), isPressed(GLFW_KEY_D),
                           deltaTime);
+  int key = glfw_getch_nonblocking(m_window);
   switch (key)
   {
   case -1:
@@ -110,6 +110,21 @@ void Engine::processInput(float deltaTime)
     break;
   case GLFW_KEY_R:
     m_group.rerun();
+    break;
+  case GLFW_KEY_RIGHT:
+    m_world.newBounds *= 1.01f;
+    m_world.m_worldDataUpdated = true;
+    m_group.m_bounds = m_world.newBounds;
+    break;
+  case GLFW_KEY_LEFT:
+    m_world.newBounds *= 0.99f;
+    m_world.m_worldDataUpdated = true;
+    m_group.m_bounds = m_world.newBounds;
+    break;
+  case GLFW_KEY_ENTER:
+    m_world.newBounds *= 10.0f;
+    m_world.m_worldDataUpdated = true;
+    m_group.m_bounds = m_world.newBounds;
     break;
   case GLFW_KEY_ESCAPE:
     shutdown();
